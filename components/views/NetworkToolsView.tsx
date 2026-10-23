@@ -444,7 +444,7 @@ export const NetworkToolsView: React.FC = () => {
         const timestamp = new Date().toLocaleString();
         const sep = "--------------------------------------------------";
 
-        content += `XYBERAH NETWORK TOOL REPORT\n`;
+        content += `ANTI.AI NETWORK TOOL REPORT\n`;
         content += `Module: ${activeCategory}\n`;
         content += `Target: ${input || 'N/A'}\n`;
         content += `Generated: ${timestamp}\n${sep}\n\n`;

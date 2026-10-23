@@ -35,6 +35,44 @@ const MODULE_LABELS: Record<string, string> = {
 
 const moduleLabel = (m: string) => MODULE_LABELS[m] || m;
 
+// Module scope on purpose: declared inside AccessControlView it was re-created on every keystroke,
+// remounting the inputs and re-firing autoFocus on the Email field.
+const ModalShell: React.FC<{
+  title: string;
+  onClose: () => void;
+  children: React.ReactNode;
+  footer: React.ReactNode;
+  error?: string | null;
+}> = ({
+  title,
+  onClose,
+  children,
+  footer,
+  error,
+}) => (
+  <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4" role="presentation" onClick={onClose}>
+    <div
+      role="dialog"
+      className="w-full max-w-lg max-h-[85vh] flex flex-col rounded-xl border border-gray-700 bg-[#0b0d12] shadow-2xl"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
+        <h3 className="text-sm font-bold text-white tracking-wide">{title}</h3>
+        <button type="button" onClick={onClose} className="p-1.5 rounded hover:bg-gray-800 text-gray-400 hover:text-white">
+          <X size={16} />
+        </button>
+      </div>
+      {error && (
+        <div className="mx-5 mt-4 p-3 bg-red-950/60 border border-red-500/50 rounded-lg text-xs font-mono text-red-200 animate-shake">
+          {error}
+        </div>
+      )}
+      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 custom-scrollbar">{children}</div>
+      <div className="flex justify-end gap-2 px-5 py-4 border-t border-gray-800">{footer}</div>
+    </div>
+  </div>
+);
+
 export const AccessControlView: React.FC = () => {
   const { can, refreshPermissions, admin } = useAuth();
   const isPlatform = !admin?.CustomerID;
@@ -289,36 +327,7 @@ export const AccessControlView: React.FC = () => {
     );
   }
 
-  const ModalShell: React.FC<{ title: string; onClose: () => void; children: React.ReactNode; footer: React.ReactNode }> = ({
-    title,
-    onClose,
-    children,
-    footer,
-  }) => (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 p-4" role="presentation" onClick={onClose}>
-      <div
-        role="dialog"
-        className="w-full max-w-lg max-h-[85vh] flex flex-col rounded-xl border border-gray-700 bg-[#0b0d12] shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-          <h3 className="text-sm font-bold text-white tracking-wide">{title}</h3>
-          <button type="button" onClick={onClose} className="p-1.5 rounded hover:bg-gray-800 text-gray-400 hover:text-white">
-            <X size={16} />
-          </button>
-        </div>
-        {error && (
-          <div className="mx-5 mt-4 p-3 bg-red-950/60 border border-red-500/50 rounded-lg text-xs font-mono text-red-200 animate-shake">
-            {error}
-          </div>
-        )}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 custom-scrollbar">{children}</div>
-        <div className="flex justify-end gap-2 px-5 py-4 border-t border-gray-800">{footer}</div>
-      </div>
-    </div>
-  );
-
-  const PermPicker = () => (
+  const permPicker = (
     <div className="space-y-4 max-h-64 overflow-y-auto border border-gray-800 rounded-lg p-3 bg-black/40 custom-scrollbar">
       {permsByModule.map(([mod, list]) => (
         <div key={mod}>
@@ -643,6 +652,7 @@ export const AccessControlView: React.FC = () => {
       {/* Add user */}
       {showAddUser && (
         <ModalShell
+          error={error}
           title="Add user"
           onClose={() => setShowAddUser(false)}
           footer={
@@ -713,6 +723,7 @@ export const AccessControlView: React.FC = () => {
       {/* Edit user */}
       {editUser && (
         <ModalShell
+          error={error}
           title={`Edit ${editUser.AdminEmail}`}
           onClose={() => setEditUser(null)}
           footer={
@@ -773,6 +784,7 @@ export const AccessControlView: React.FC = () => {
       {/* Add group */}
       {showAddGroup && (
         <ModalShell
+          error={error}
           title="Add group"
           onClose={() => setShowAddGroup(false)}
           footer={
@@ -812,7 +824,7 @@ export const AccessControlView: React.FC = () => {
           </label>
           <div className="space-y-2">
             <span className="text-[10px] uppercase tracking-wider text-gray-500">Access rights</span>
-            <PermPicker />
+            {permPicker}
           </div>
         </ModalShell>
       )}
@@ -820,6 +832,7 @@ export const AccessControlView: React.FC = () => {
       {/* Edit group */}
       {editGroup && (
         <ModalShell
+          error={error}
           title={`Edit group · ${editGroup.Name}`}
           onClose={() => setEditGroup(null)}
           footer={
@@ -856,7 +869,7 @@ export const AccessControlView: React.FC = () => {
           </label>
           <div className="space-y-2">
             <span className="text-[10px] uppercase tracking-wider text-gray-500">Access rights</span>
-            <PermPicker />
+            {permPicker}
           </div>
         </ModalShell>
       )}

@@ -318,7 +318,7 @@ export const BigScreenView: React.FC<BigScreenViewProps> = ({
     urlHausItems = [], feodoItems = [], malwareBazaarItems = [],
     threatFoxItems = [], sslBlItems = [], ja3Items = [],
     ransomwarePosts = [], ransomwareGroups = [],
-    onExit, onRefresh, productName = 'XYBERAH', logoUrl
+    onExit, onRefresh, productName = 'ANTI.AI', logoUrl
 }) => {
     const [showGlobalThreats, setShowGlobalThreats] = useState(true);
     const [activeTab, setActiveTab] = useState<SocTab>('OPS');

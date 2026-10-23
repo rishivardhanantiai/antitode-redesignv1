@@ -190,7 +190,7 @@ export const generateStix21BundleJsonV3 = (hosts: HostV3[]): string => {
     id: identityId,
     created: timestamp,
     modified: timestamp,
-    name: 'Xyberah Honeypot System',
+    name: 'ANTI.AI Honeypot System',
     identity_class: 'organization',
   };
 

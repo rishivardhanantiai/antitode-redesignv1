@@ -1696,9 +1696,9 @@ export const XyberahReconView: React.FC = () => {
           </div>
           <div>
             <h2 className="text-lg font-bold text-white font-cyber">
-              Xyberah <span className="text-white">RECON</span>
+              ANTI.AI <span className="text-white">RECON</span>
             </h2>
-            <p className="text-xs text-[#888] font-mono">Reconnaissance via Xyberah</p>
+            <p className="text-xs text-[#888] font-mono">Reconnaissance via ANTI.AI</p>
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
@@ -1757,7 +1757,7 @@ export const XyberahReconView: React.FC = () => {
             }
           >
             {healthLoading && !health ? <Loader2 size={14} className="animate-spin shrink-0" /> : null}
-            Xyberah Recon:{' '}
+            ANTI.AI Recon:{' '}
             {healthLoading && !health
               ? '…'
               : String(health?.status ?? 'unknown')
@@ -3628,7 +3628,7 @@ export const XyberahReconView: React.FC = () => {
                 {workers.length === 0 && !workersRefreshing ? (
                   <div className="rounded-xl border border-[#222] bg-[#111] p-8 text-center text-sm text-[#888]">
                     No workers returned. If this persists, ensure <code className="text-white">GET /asm/workers</code> is implemented on
-                    the Xyberah backend proxy.
+                    the ANTI.AI backend proxy.
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

@@ -74,6 +74,12 @@ const fmtDate = (s: string) => {
 
 // ── CopyButton ─────────────────────────────────────────────────────────────
 
+/** Lower-case helper: does the signed-in user hold this permission? Server still enforces it. */
+const useCan = () => {
+    const { permissions } = useAuth();
+    return (p: string) => permissions.includes(p);
+};
+
 const CopyButton: React.FC<{ text: string; className?: string }> = ({ text, className = '' }) => {
     const [copied, setCopied] = useState(false);
     const copy = () => {
@@ -744,6 +750,7 @@ const ServerDetailPanel: React.FC<{
     onShipperChanged: () => void;
     templates: DeploymentTemplate[];
 }> = ({ server, onClose, onRegisterAgent, onRefreshList, onShipperChanged, templates }) => {
+    const can = useCan();
     const [tab, setTab] = useState<DetailTab>('overview');
     const [detail, setDetail] = useState<ServerDetailResponse | null>(null);
     const [containers, setContainers] = useState<ListContainersResponse | null>(null);
@@ -946,19 +953,19 @@ const ServerDetailPanel: React.FC<{
                     <div className="text-xs text-[#888] font-mono">{server.PublicIp} · {server.Region} · {server.Provider}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                    {agentId && isOnline && (
+                    {can('infrastructure.deployments.manage') && agentId && isOnline && (
                         <button onClick={() => setShowDeploy(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono hover:bg-red-500/20 transition-colors">
                             <Upload size={12}/> Deploy
                         </button>
                     )}
-                    {!server.agent.isRegistered && (
+                    {can('infrastructure.servers.manage') && !server.agent.isRegistered && (
                         <button onClick={() => onRegisterAgent(server.ServerId)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-neutral-500/10 border border-neutral-500/30 text-red-400 text-xs font-mono hover:bg-neutral-500/20 transition-colors">
                             <Plus size={12}/> Register Agent
                         </button>
                     )}
-                    <button onClick={doDeleteServer} title="Delete server (cascade)" className="p-1.5 rounded hover:bg-red-900/40 text-red-500/60 hover:text-red-400 transition-colors" >
+                    {can('infrastructure.servers.manage') && (<button onClick={doDeleteServer} title="Delete server (cascade)" className="p-1.5 rounded hover:bg-red-900/40 text-red-500/60 hover:text-red-400 transition-colors" >
                         <Trash2 size={15}/>
-                    </button>
+                    </button>)}
                     <button onClick={onClose} className="p-1.5 rounded hover:bg-[#151515] text-[#AAA] hover:text-white"><X size={16}/></button>
                 </div>
             </div>
@@ -1023,7 +1030,7 @@ const ServerDetailPanel: React.FC<{
                         <div className="bg-[#111] border border-[#222] rounded-xl p-4 space-y-3">
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold text-[#AAA] uppercase tracking-widest font-mono">Agent</h4>
-                                {detail.agent.isRegistered && agentId && (
+                                {can('infrastructure.servers.manage') && detail.agent.isRegistered && agentId && (
                                     <div className="flex items-center gap-1.5">
                                         <button onClick={doDeleteAgent} className="text-[10px] text-white hover:text-white font-mono flex items-center gap-1 px-2 py-0.5 rounded border border-neutral-500/20 hover:border-neutral-500/40 transition-colors">
                                             <Trash2 size={10}/> Soft Remove
@@ -1054,9 +1061,9 @@ const ServerDetailPanel: React.FC<{
                             ) : (
                                 <div className="flex flex-col items-center gap-3 py-4">
                                     <p className="text-xs text-[#888] font-mono">No agent registered for this server.</p>
-                                    <button onClick={() => onRegisterAgent(server.ServerId)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-500/10 border border-neutral-500/30 text-red-400 text-xs font-mono hover:bg-neutral-500/20 transition-colors">
+                                    {can('infrastructure.servers.manage') && (<button onClick={() => onRegisterAgent(server.ServerId)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-neutral-500/10 border border-neutral-500/30 text-red-400 text-xs font-mono hover:bg-neutral-500/20 transition-colors">
                                         <Plus size={13}/> Register Agent
-                                    </button>
+                                    </button>)}
                                 </div>
                             )}
                         </div>
@@ -1065,7 +1072,7 @@ const ServerDetailPanel: React.FC<{
                         <div className="bg-[#111] border border-[#222] rounded-xl p-4 space-y-3">
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold text-[#AAA] uppercase tracking-widest font-mono">Log Shipper</h4>
-                                {!detail.shipper.isRegistered && (
+                                {can('infrastructure.shippers.manage') && !detail.shipper.isRegistered && (
                                     <button onClick={() => setShowRegisterShipper(true)} className="flex items-center gap-1 px-2.5 py-1 rounded bg-neutral-500/10 border border-neutral-500/30 text-white text-[10px] font-mono hover:bg-neutral-500/20 transition-colors">
                                         <Plus size={10}/> Register
                                     </button>
@@ -1093,7 +1100,7 @@ const ServerDetailPanel: React.FC<{
                                             <AlertTriangle size={11}/>{shipperActionError}
                                         </div>
                                     )}
-                                    <div className="flex gap-2 pt-1 flex-wrap">
+                                    {can('infrastructure.shippers.manage') && (<div className="flex gap-2 pt-1 flex-wrap">
                                         {detail.shipper.Active ? (
                                             <button
                                                 onClick={async () => {
@@ -1132,7 +1139,7 @@ const ServerDetailPanel: React.FC<{
                                         >
                                             <Trash2 size={11}/> Delete
                                         </button>
-                                    </div>
+                                    </div>)}
                                 </>
                             ) : (
                                 <p className="text-xs text-[#888] font-mono">No log shipper registered for this server.</p>
@@ -1189,7 +1196,7 @@ const ServerDetailPanel: React.FC<{
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <span className="text-xs font-bold text-white font-mono truncate">{c.name}</span>
-                                                {c.isXyberah && <span className="text-[9px] px-1.5 py-0.5 bg-red-500/10 border border-red-500/20 text-red-500 rounded font-mono">XYBERAH</span>}
+                                                {c.isXyberah && <span className="text-[9px] px-1.5 py-0.5 bg-red-500/10 border border-red-500/20 text-red-500 rounded font-mono">ANTI.AI</span>}
                                                 {containerStateBadge(c.state)}
                                             </div>
                                             <div className="text-[11px] text-[#888] font-mono mt-0.5">{c.image}</div>
@@ -1198,16 +1205,16 @@ const ServerDetailPanel: React.FC<{
                                             )}
                                         </div>
                                         <div className="flex items-center gap-1 shrink-0">
-                                            <button onClick={() => setLogTarget(c)} title="Logs" className="p-1.5 rounded hover:bg-[#1C1C1C] text-[#AAA] hover:text-white transition-colors"><Terminal size={13}/></button>
-                                            {c.state === 'running' ? (
+                                            {can('infrastructure.containers.control') && (<button onClick={() => setLogTarget(c)} title="Logs" className="p-1.5 rounded hover:bg-[#1C1C1C] text-[#AAA] hover:text-white transition-colors"><Terminal size={13}/></button>)}
+                                            {can('infrastructure.containers.control') && (c.state === 'running' ? (
                                                 <>
                                                     <button onClick={() => doContainerAction(c, 'stop')} disabled={!!loadingAction} title="Stop" className="p-1.5 rounded hover:bg-[#1C1C1C] text-white hover:text-white transition-colors"><Square size={13}/></button>
                                                     <button onClick={() => doContainerAction(c, 'restart')} disabled={!!loadingAction} title="Restart" className="p-1.5 rounded hover:bg-[#1C1C1C] text-white hover:text-white transition-colors"><RotateCcw size={13}/></button>
                                                 </>
                                             ) : (
                                                 <button onClick={() => doContainerAction(c, 'start')} disabled={!!loadingAction} title="Start" className="p-1.5 rounded hover:bg-[#1C1C1C] text-white hover:text-white transition-colors"><Play size={13}/></button>
-                                            )}
-                                            <button onClick={() => doRemoveContainer(c)} disabled={!!loadingAction} title="Remove" className="p-1.5 rounded hover:bg-[#1C1C1C] text-red-400 hover:text-red-300 transition-colors"><Trash2 size={13}/></button>
+                                            ))}
+                                            {can('infrastructure.containers.manage') && (<button onClick={() => doRemoveContainer(c)} disabled={!!loadingAction} title="Remove" className="p-1.5 rounded hover:bg-[#1C1C1C] text-red-400 hover:text-red-300 transition-colors"><Trash2 size={13}/></button>)}
                                         </div>
                                     </div>
                                     <div className="text-[10px] text-neutral-600 font-mono mt-1">{c.status}</div>
@@ -1223,7 +1230,7 @@ const ServerDetailPanel: React.FC<{
                         <div className="flex justify-between items-center">
                             <span className="text-xs text-[#888] font-mono">{deployments?.count ?? 0} deployments</span>
                             <div className="flex gap-2">
-                                {isOnline && <button onClick={() => setShowDeploy(true)} className="flex items-center gap-1 px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono hover:bg-red-500/20"><Plus size={11}/> Deploy</button>}
+                                {can('infrastructure.deployments.manage') && isOnline && <button onClick={() => setShowDeploy(true)} className="flex items-center gap-1 px-3 py-1 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono hover:bg-red-500/20"><Plus size={11}/> Deploy</button>}
                                 <button onClick={loadDeployments} className="p-1.5 rounded hover:bg-[#151515] text-[#AAA] hover:text-white"><RefreshCw size={13}/></button>
                             </div>
                         </div>
@@ -1236,13 +1243,13 @@ const ServerDetailPanel: React.FC<{
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {deployStatusBadge(dep.Status)}
-                                        {dep.Status === 'active' && (
+                                        {can('infrastructure.deployments.manage') && dep.Status === 'active' && (
                                             <button onClick={() => doDeploymentAction(dep.DeploymentId, 'stop')} disabled={!!loadingAction} title="Stop Stack" className="p-1 rounded hover:bg-[#1C1C1C] text-white"><Square size={12}/></button>
                                         )}
-                                        {dep.Status === 'stopped' && (
+                                        {can('infrastructure.deployments.manage') && dep.Status === 'stopped' && (
                                             <button onClick={() => doDeploymentAction(dep.DeploymentId, 'start')} disabled={!!loadingAction} title="Start Stack" className="p-1 rounded hover:bg-[#1C1C1C] text-white"><Play size={12}/></button>
                                         )}
-                                        <button onClick={() => doRemoveDeployment(dep.DeploymentId, dep.StackName)} disabled={!!loadingAction} title="Remove" className="p-1 rounded hover:bg-[#1C1C1C] text-red-400"><Trash2 size={12}/></button>
+                                        {can('infrastructure.deployments.manage') && (<button onClick={() => doRemoveDeployment(dep.DeploymentId, dep.StackName)} disabled={!!loadingAction} title="Remove" className="p-1 rounded hover:bg-[#1C1C1C] text-red-400"><Trash2 size={12}/></button>)}
                                     </div>
                                 </div>
                                 <div className="text-[10px] text-[#888] font-mono">Created {fmtDate(dep.CreatedAt)}</div>
@@ -1308,6 +1315,7 @@ const ServerDetailPanel: React.FC<{
 // ── Templates Panel ────────────────────────────────────────────────────────
 
 const TemplatesPanel: React.FC<{ templates: DeploymentTemplate[]; loading: boolean; onRefresh: () => void }> = ({ templates, loading, onRefresh }) => {
+    const can = useCan();
     const [filterCat, setFilterCat] = useState<TemplateCategory | 'all'>('all');
     const [editTarget, setEditTarget] = useState<DeploymentTemplate | null | undefined>(undefined); // undefined=closed, null=create
     const [confirm, setConfirm] = useState<{ title: string; message: string; action: () => void } | null>(null);
@@ -1356,7 +1364,7 @@ const TemplatesPanel: React.FC<{ templates: DeploymentTemplate[]; loading: boole
                         ))}
                     </div>
                     <button onClick={onRefresh} disabled={loading} className="p-1.5 rounded hover:bg-[#151515] text-[#AAA] hover:text-white"><RefreshCw size={14} className={loading ? 'animate-spin' : ''}/></button>
-                    <button onClick={() => setEditTarget(null)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono hover:bg-red-500/20"><Plus size={13}/> New</button>
+                    {can('infrastructure.templates.manage') && (<button onClick={() => setEditTarget(null)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono hover:bg-red-500/20"><Plus size={13}/> New</button>)}
                 </div>
             </div>
 
@@ -1383,11 +1391,11 @@ const TemplatesPanel: React.FC<{ templates: DeploymentTemplate[]; loading: boole
                                     <div className="text-sm font-bold text-white font-mono truncate">{t.Name}</div>
                                     <span className={`inline-block mt-1 px-2 py-0.5 rounded border text-[10px] font-mono font-bold ${catColors[t.Category] ?? 'text-[#AAA] bg-[#1C1C1C] border-neutral-600'}`}>{t.Category}</span>
                                 </div>
-                                <div className="flex items-center gap-1 shrink-0">
+                                {can('infrastructure.templates.manage') && (<div className="flex items-center gap-1 shrink-0">
                                     <button onClick={() => setEditTarget(t)} title="Edit" className="p-1.5 rounded hover:bg-[#1C1C1C] text-[#AAA] hover:text-white transition-colors"><Edit2 size={13}/></button>
                                     <button onClick={() => toggleActive(t)} title={t.IsActive ? 'Deactivate' : 'Activate'} className={`p-1.5 rounded hover:bg-[#1C1C1C] transition-colors ${t.IsActive ? 'text-white' : 'text-neutral-600'}`}>{t.IsActive ? <ToggleRight size={15}/> : <ToggleLeft size={15}/>}</button>
                                     <button onClick={() => deleteTemplate(t)} title="Delete" className="p-1.5 rounded hover:bg-[#1C1C1C] text-red-400 hover:text-red-300 transition-colors"><Trash2 size={13}/></button>
-                                </div>
+                                </div>)}
                             </div>
                             {t.Description && <p className="text-xs text-[#888]">{t.Description}</p>}
                             {Object.keys(t.EnvTemplate ?? {}).length > 0 && (
@@ -1416,6 +1424,7 @@ const ShippersPanel: React.FC<{
     loading: boolean;
     onRefresh: () => void;
 }> = ({ shippers, loading, onRefresh }) => {
+    const can = useCan();
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [actionError, setActionError] = useState('');
     const [confirm, setConfirm] = useState<{ title: string; message: string; action: () => void } | null>(null);
@@ -1511,7 +1520,7 @@ const ShippersPanel: React.FC<{
                                         <td className="px-4 py-3 text-[#888]">{s.LastSeenAt ? fmtDate(s.LastSeenAt) : '—'}</td>
                                         <td className="px-4 py-3 text-[#888]">{fmtDate(s.CreatedAt)}</td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center justify-center gap-1.5">
+                                            {can('infrastructure.shippers.manage') && (<div className="flex items-center justify-center gap-1.5">
                                                 <button
                                                     onClick={() => toggle(s)}
                                                     disabled={actionLoading === s.ShipperId}
@@ -1534,7 +1543,7 @@ const ShippersPanel: React.FC<{
                                                 >
                                                     <Trash2 size={11}/>
                                                 </button>
-                                            </div>
+                                            </div>)}
                                         </td>
                                     </tr>
                                 ))}
@@ -1553,6 +1562,7 @@ const ShippersPanel: React.FC<{
 type InfraTab = 'servers' | 'templates' | 'shippers';
 
 export const InfrastructureView: React.FC = () => {
+    const can = useCan();
     const [infraTab, setInfraTab] = useState<InfraTab>('servers');
     const [overview, setOverview] = useState<ServersOverviewResponse | null>(null);
     const [templates, setTemplates] = useState<ListTemplatesResponse | null>(null);
@@ -1707,12 +1717,12 @@ export const InfrastructureView: React.FC = () => {
                         <div className="p-3 border-b border-[#222] flex items-center justify-between shrink-0">
                             <span className="text-xs text-[#888] font-mono">{overview?.count ?? 0} servers registered</span>
                             <div className="flex items-center gap-2">
-                                <button
+                                {can('infrastructure.servers.manage') && (<button
                                     onClick={() => setShowRegisterServer(true)}
                                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30 text-red-500 text-[11px] font-mono font-bold hover:bg-red-500/20 transition-colors"
                                 >
                                     <Plus size={12}/> Register Server
-                                </button>
+                                </button>)}
                                 <button onClick={loadOverview} disabled={loadingOverview} className="p-1.5 rounded hover:bg-[#151515] text-[#AAA] hover:text-white"><RefreshCw size={13} className={loadingOverview ? 'animate-spin' : ''}/></button>
                             </div>
                         </div>

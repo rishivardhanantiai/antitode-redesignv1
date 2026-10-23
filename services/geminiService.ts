@@ -65,8 +65,8 @@ export const createThreatChat = (context: string): ThreatChatSession => {
   const systemInstruction = {
     parts: [
       {
-        text: `You are Xyberah AI, an elite cybersecurity threat intelligence assistant.
-Embedded in Xyberah Threat Processor SOC platform.
+        text: `You are ANTI.AI, an elite cybersecurity threat intelligence assistant.
+Embedded in ANTI.AI Threat Processor SOC platform.
 
 CURRENT SESSION CONTEXT:
 ${context}
@@ -111,7 +111,7 @@ ROLE & BEHAVIOR:
       }
 
       // Offline / fallback response
-      const fallbackText = `**[Xyberah AI SOC Analysis]**\n\nAnalyzed input: "${message}"\n\n` +
+      const fallbackText = `**[ANTI.AI SOC Analysis]**\n\nAnalyzed input: "${message}"\n\n` +
         `- Threat assessment: Monitored sensor telemetry active.\n` +
         `- Correlation: Cross-referenced with local threat intelligence and honeypot records.\n` +
         `- Recommendation: Verify IP reputation against AbuseIPDB and isolate any critical score hosts.\n\n` +

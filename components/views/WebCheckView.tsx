@@ -62,7 +62,7 @@ export const WebCheckView: React.FC<WebCheckViewProps> = ({ logoUrl }) => {
         const sep = "--------------------------------------------------------------------------------";
         
         lines.push(sep);
-        lines.push(`XYBERAH WEB CHECK REPORT`);
+        lines.push(`ANTI.AI WEB CHECK REPORT`);
         lines.push(sep);
         lines.push(`Target:       ${result.target}`);
         lines.push(`Scan Date:    ${new Date().toLocaleString()}`);

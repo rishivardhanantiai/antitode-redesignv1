@@ -30,6 +30,7 @@ import {
 
 import { dataProvider } from '../services/dataProvider';
 import { useAppData } from '../contexts/AppDataContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { isPublicDemo } from '../utils/demoMode';
 import EmptyState from '../components/common/EmptyState';
 import PageHeader from '../components/layout/PageHeader';
@@ -423,6 +424,8 @@ function parseAdvancedQuery(
 
 export default function IocPage() {
   const { onNavigate } = useAppData();
+  const { permissions } = useAuth();
+  const canExportIoc = permissions.includes('ioc.feed.export');
   const [liveIocs, setLiveIocs] = useState<IocRecord[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(1);
@@ -1106,7 +1109,7 @@ export default function IocPage() {
               {isRefreshing ? 'Refreshing' : 'Refresh'}
             </button>
 
-            <button
+            {canExportIoc && (<button
               type="button"
               className="at-btn at-btn-secondary at-btn-sm"
               onClick={exportStix}
@@ -1116,7 +1119,7 @@ export default function IocPage() {
             >
               <Download size={13} />
               STIX 2.1
-            </button>
+            </button>)}
           </>
         }
       />
@@ -2028,7 +2031,7 @@ export default function IocPage() {
               /* ---------------------------------------------------------- */}
 
               <div className="at-ioc-inspector-footer">
-                <button
+                {canExportIoc && (<button
                   type="button"
                   className="at-btn at-btn-secondary"
                   onClick={
@@ -2037,7 +2040,7 @@ export default function IocPage() {
                 >
                   <Download size={12} />
                   Export IOC
-                </button>
+                </button>)}
 
                 <button
                   type="button"

@@ -1,5 +1,5 @@
 {
-  "name": "Xyberah Threat Processor v1.25",
+  "name": "ANTI.AI Threat Processor v1.25",
   "description": "A high-fidelity Cyberpunk Threat Intelligence Processor. Analyze server logs for malware signatures, score threats, and export STIX/CSV reports entirely in the browser.",
   "requestFramePermissions": []
 }

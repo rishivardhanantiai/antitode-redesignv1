@@ -53,7 +53,7 @@ export const HelpView: React.FC = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         <HelpSection title="Getting Started" icon={Rocket}>
                             <p>
-                                <strong>Xyberah Threat Processor</strong> is a client-side threat intelligence and forensic analysis platform. 
+                                <strong>ANTI.AI Threat Processor</strong> is a client-side threat intelligence and forensic analysis platform. 
                                 It runs entirely in your browser, ensuring data privacy while providing advanced analytic capabilities.
                             </p>
                             <div className="bg-[#111] border border-neutral-500/20 p-4 rounded text-white text-xs font-mono mt-2">

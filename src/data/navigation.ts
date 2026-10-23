@@ -105,6 +105,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'nettools', icon: HardDrive, label: 'Network Tools', desc: 'DNS lookup, Whois, Traceroute, and more.' },
       { id: 'webcheck', icon: Globe, label: 'Web Check', desc: 'Deep website analysis and header inspection.' },
+      { id: 'sandbox', icon: HardDrive, label: 'Security Sandbox', desc: 'Secure web browser for inspecting malicious sites.', status: 'hidden' },
     ],
   },
   {
@@ -116,7 +117,7 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Reconnaissance',
     items: [
-      { id: 'recon', icon: Target, label: 'Xyberah Recon', desc: 'Attack surface reconnaissance — workspaces, targets, assets, vulnerabilities, and workers.', status: 'live', permissionPrefix: 'osm.' },
+      { id: 'recon', icon: Target, label: 'ANTI.AI Recon', desc: 'Attack surface reconnaissance — workspaces, targets, assets, vulnerabilities, and workers.', status: 'live', permissionPrefix: 'osm.' },
       { id: 'integrations', icon: Cable, label: 'SIEM Connectors', desc: 'Real-time event pipelines & push/pull threat intelligence feeds.', status: 'live', permissionPrefix: 'integrations.' },
     ],
   },

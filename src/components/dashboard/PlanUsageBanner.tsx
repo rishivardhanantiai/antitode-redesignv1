@@ -19,6 +19,7 @@ import {
   setStoredPlan,
   type PlanTier,
 } from '../../data/planTiering';
+import { useAuth } from '../../../contexts/AuthContext';
 import { billingService } from '../../../api/services/billingService';
 import { isPublicDemo } from '../../utils/demoMode';
 
@@ -74,6 +75,9 @@ export default function PlanUsageBanner({
 
   const isNearLimit = honeypotRatio >= 75 || eventRatio >= 75;
   const isBasic = currentPlan === 'basic';
+  // Changing the plan needs the same permission the server asks for (rbac.users.manage).
+  const { permissions } = useAuth();
+  const canChangePlan = permissions.includes('rbac.users.manage');
   const isPro = currentPlan === 'pro';
 
   const openUpgradeModal = () => {
@@ -147,7 +151,7 @@ export default function PlanUsageBanner({
             </p>
           </div>
 
-          <div className="at-plan-quota-actions">
+          {canChangePlan && (<div className="at-plan-quota-actions">
             <button
               type="button"
               className="at-btn at-btn-secondary at-btn-sm"
@@ -166,7 +170,7 @@ export default function PlanUsageBanner({
                 Upgrade
               </button>
             )}
-          </div>
+          </div>)}
         </div>
 
         <div className="at-plan-meters-grid">
@@ -261,7 +265,7 @@ export default function PlanUsageBanner({
                   Upgrade for JSON exports →
                 </span>
               )}
-              {isPro && <span>JSON exports unlocked (Task #78)</span>}
+              {isPro && <span>JSON exports unlocked</span>}
               {!isBasic && !isPro && <span>Full TAXII &amp; PDF suite active</span>}
             </div>
           </div>
